@@ -1,0 +1,4 @@
+*.m~
+*.pyc
+import_caffe_networks/OF_caffe_net/
+matconvnet-1.0-beta11.tar

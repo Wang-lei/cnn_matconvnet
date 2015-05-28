@@ -1,0 +1,5 @@
+# google proto path
+export PYTHONPATH=$PYTHONPATH:~/software/matlab_toolboxes/matconvnet-1.0-beta9/utils
+
+# caffe path
+export PYTHONPATH=$PYTHONPATH:/home/fsrajer/caffe/python
