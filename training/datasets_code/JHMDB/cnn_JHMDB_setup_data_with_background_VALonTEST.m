@@ -88,7 +88,7 @@ imdb.images.set(end+1:end+nbimtest) = imdbtest.images.set ;
 imdb.images.bbox(end+1:end+nbimtest) = cell(nbimtest,1) ;
 
 % add background images
-nb_background_image = 200000 ;
+nb_background_image = opts.backgroundnum ;
 nb_valid_bg_image=sum(~cellfun(@isempty,imdb.images.bbox) .* (imdb.images.set == 1)');
 background_per_train_image=round(nb_background_image/nb_valid_bg_image);
 numbackimage=length(imdb.images.name)*background_per_train_image;

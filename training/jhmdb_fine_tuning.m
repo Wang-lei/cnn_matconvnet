@@ -15,10 +15,10 @@ for split = 1:1
     opts.batchwrapper.do_jittering=1;
     opts.batchwrapper.opts_jittering.isopticalflow=1;
     opts.batchwrapper.do_background_proposals = 1 ;
-    opts.batchwrapper.opts_background_proposals.box_id = 4 ;
+    opts.batchwrapper.opts_background_proposals.box_id = 1 ; %[1 lhand, 2 rhand, 3 upbody, 4 fullbody]
     
-    opts.part = 'full_body' ;
-    
+    %opts.part = 'full_body' ;
+    opts.part ='left_hand' ;
     
     opts.split = split ;
     opts.splitpath = '/sequoia/data1/gcheron/ICCV15/JHMDB/splitlists/experimentsplits' ;
@@ -28,13 +28,14 @@ for split = 1:1
     %opts.originalProposalDataDir = '/home/local/gcheron/datasets/JHMDB/cnn_OF/full_image';
     
     %opts.expDir = sprintf('/sequoia/data1/gcheron/code/cnn_matconvnet/training/experiments/JHMDB_fine-tuning/JHMDB_split%d_%s',opts.split,opts.part) ;
-    opts.expDir = sprintf('/home/local/gcheron/cnn_matconv_net/JHMDB/experiments/JHMDB_fine-tuning/JHMDB_split%d_%s',opts.split,opts.part) ;
+    %opts.expDir = sprintf('/home/local/gcheron/cnn_matconv_net/JHMDB/experiments/JHMDB_fine-tuning/JHMDB_split%d_%s',opts.split,opts.part) ;
+    opts.expDir = sprintf('/home/local/gcheron/cnn_matconv_net/JHMDB/experiments/JHMDB_fine-tuning/JHMDB_split%d_%s_BPfc1conv_WBsameLR',opts.split,opts.part) ;
    
     opts.actionsnames={'brush_hair','catch','clap','climb_stairs','golf','jump','kick_ball','pick','pour','pullup','push','run','shoot_ball','shoot_bow','shoot_gun','sit','stand','swing_baseball','throw','walk','wave'} ;
     opts.joitsDir='/sequoia/data1/gcheron/JHMDB/joint_positions';
     
-    
-    opts.imdbPath = sprintf('/sequoia/data1/gcheron/code/cnn_matconvnet/training/experiments/JHMDB_fine-tuning/imdb_JHMDB_split%d_%s.mat',opts.split,opts.part);
+    opts.backgroundnum=200000 ; % 55000;
+    opts.imdbPath = sprintf('/sequoia/data1/gcheron/code/cnn_matconvnet/training/experiments/JHMDB_fine-tuning/imdb_JHMDB_split%d_%s_bnum%i.mat',opts.split,opts.part,opts.backgroundnum);
     opts.lite = false ;
     
     opts.netpath = 'bignet_flow_wmag_finetune_split1_iter_50000.mat';
@@ -45,7 +46,7 @@ for split = 1:1
     opts.train.gpus = gpuID ;
     opts.train.learningRate = [1e-3*ones(1,20) 1e-4*ones(1,20) 1e-5*ones(1,20)] ;
     opts.train.expDir = opts.expDir ;
-    opts.train.backPropDepth = +inf;%8 ;
+    opts.train.backPropDepth = 11 ; % until conv5 % +inf; % BP all ; %8 all FC ;
     
     % -------------------------------------------------------------------------
     %                                                    Network initialization
@@ -158,14 +159,15 @@ function net = initializeNetwork(opt)
 net=load(opt.netpath);
 for i=1:length(net.layers)
     if ~strcmp(net.layers{i}.type,'conv') ; continue ; end
-    net.layers{i}.learningRate = [1 2] ;
+    %net.layers{i}.learningRate = [1 2] ;
+    net.layers{i}.learningRate = [1 1] ;
     net.layers{i}.weightDecay = [1 0] ;
 end
 net.layers{end-1} = struct('type', 'conv', ...
     'weights', [], ...
     'stride', 1, ...
     'pad', 0, ...
-    'learningRate', [10 20], ...
+    'learningRate', [1 1], ...    %'learningRate', [10 20], ...
     'weightDecay', [1 0], ...
     'name', 'fc8_JHMDB');
 %net.layers{end-1}.weights ={0.01 * randn(1,1,4096,21,'single'),zeros(1, 21, 'single')};

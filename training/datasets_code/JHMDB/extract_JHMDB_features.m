@@ -8,7 +8,8 @@ gpuDevice(1);
 matconvpath = '/sequoia/data1/gcheron/code/cnn_matconvnet/matconvnet-1.0-beta11';
 run([matconvpath '/matlab/vl_setupnn.m']) ;
 %netpath='/sequoia/data1/gcheron/code/cnn_matconvnet/training/experiments/JHMDB_fine-tuning/JHMDB_split1_full_body_BPall/net-epoch-60.mat';laynum=20;%21
-netpath='/sequoia/data1/gcheron/code/cnn_matconvnet/import_caffe_networks/OF_caffe_net/bignet_flow_wmag_finetune_split1_iter_50000.mat';laynum=19;
+netpath='/home/local/gcheron/cnn_matconv_net/JHMDB/experiments/JHMDB_fine-tuning/JHMDB_split1_full_body_BPall/net-epoch-60.mat';laynum=21;%20
+%netpath='/sequoia/data1/gcheron/code/cnn_matconvnet/import_caffe_networks/OF_caffe_net/bignet_flow_wmag_finetune_split1_iter_50000.mat';laynum=19;
 net=load(netpath);net=net.net; net.layers = net.layers(1:end-1);
 net = vl_simplenn_move(net, 'gpu') ;
 bsize=128;
@@ -29,9 +30,9 @@ end
 function [filelist,outlist]=get_OF_list()
 bodyparts={'full_body','full_image','left_hand','right_hand','upper_body'};
 flowdir='/tmp/JHMDB/cnn_OF' ;
-%outdir='/sequoia/data1/gcheron/JHMDB/cnn_OF_finefullbody_split1/features';
+outdir='/sequoia/data1/gcheron/JHMDB/cnn_OF_finefullbody_split1/features';
 %outdir='/sequoia/data1/gcheron/JHMDB/cnn_OF_finefullbodynorelu_split1/features';
-outdir='/sequoia/data1/gcheron/JHMDB/cnn_OF_norelu/features';
+%outdir='/sequoia/data1/gcheron/JHMDB/cnn_OF_norelu/features';
 
 filelist={};
 outlist={};
