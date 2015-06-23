@@ -8,12 +8,12 @@ addpath([matconvpath '/examples'],'/sequoia/data1/gcheron/code/cnn_matconvnet/tr
 
 gpuID = 1 ;
 
-for split = 1:1
+for split = 1:3
 
     % batch opt
     opts.batchwrapper.numFetchThreads = 6 ;
     opts.batchwrapper.do_jittering=1;
-    opts.batchwrapper.opts_jittering.isopticalflow=0; %1
+    opts.batchwrapper.opts_jittering.isopticalflow=1; %0; %1
     opts.batchwrapper.do_background_proposals = 1 ;
     opts.batchwrapper.opts_background_proposals.box_id = 4 ; %[1 lhand, 2 rhand, 3 upbody, 4 fullbody]
     
@@ -22,29 +22,30 @@ for split = 1:1
     
     opts.split = split ;
     opts.splitpath = '/sequoia/data1/gcheron/ICCV15/JHMDB/splitlists/experimentsplits' ;
-    opts.dataDir = sprintf('/tmp/JHMDB/cnn_images/%s/resized',opts.part) ; %sprintf('/tmp/JHMDB/cnn_OF/%s/resized227',opts.part) ; sprintf('/home/local/gcheron/datasets/JHMDB/cnn_OF/%s/resized227',opts.part) ;
-    opts.originalProposalDataDir = '/tmp/JHMDB/cnn_images/full_image'; % /tmp/JHMDB/cnn_OF/full_image %'/home/local/gcheron/datasets/JHMDB/cnn_OF/full_image';
+    opts.dataDir = sprintf('/tmp/JHMDB/cnn_OF/%s/resized227',opts.part) ;%sprintf('/tmp/JHMDB/cnn_images/%s/resized',opts.part) ; %sprintf('/tmp/JHMDB/cnn_OF/%s/resized227',opts.part) ; sprintf('/home/local/gcheron/datasets/JHMDB/cnn_OF/%s/resized227',opts.part) ;
+    opts.originalProposalDataDir = '/tmp/JHMDB/cnn_OF/full_image'; %'/home/local/gcheron/datasets/JHMDB/cnn_images/full_image' ; %'/tmp/JHMDB/cnn_images/full_image'; % /tmp/JHMDB/cnn_OF/full_image %'/home/local/gcheron/datasets/JHMDB/cnn_OF/full_image';
     
     %opts.expDir = sprintf('/sequoia/data1/gcheron/code/cnn_matconvnet/training/experiments/JHMDB_fine-tuning/JHMDB_split%d_%s',opts.split,opts.part) ;
     %opts.expDir = sprintf('/home/local/gcheron/cnn_matconvnet/JHMDB/experiments/JHMDB_fine-tuning/JHMDB_split%d_%s',opts.split,opts.part) ;
     %opts.expDir = sprintf('/home/local/gcheron/cnn_matconvnet/JHMDB/experiments/JHMDB_fine-tuning/JHMDB_split%d_%s_BPfc1conv_WBsameLR',opts.split,opts.part) ;
-    opts.expDir = sprintf('/home/local/gcheron/cnn_matconvnet/JHMDB/experiments/JHMDB_fine-tuning/JHMDB_split%d_%s_APP_BPall_WBsameLR',opts.split,opts.part) ;
+    %opts.expDir = sprintf('/home/local/gcheron/cnn_matconvnet/JHMDB/experiments/JHMDB_fine-tuning/JHMDB_split%d_%s_APP_BPall_WBsameLR',opts.split,opts.part) ;
+    opts.expDir = sprintf('/home/local/gcheron/cnn_matconvnet/JHMDB/experiments/JHMDB_fine-tuning/JHMDB_split%d_%s_BPall_WBsameLR_run2',opts.split,opts.part) ;
    
     opts.actionsnames={'brush_hair','catch','clap','climb_stairs','golf','jump','kick_ball','pick','pour','pullup','push','run','shoot_ball','shoot_bow','shoot_gun','sit','stand','swing_baseball','throw','walk','wave'} ;
     opts.joitsDir='/sequoia/data1/gcheron/JHMDB/joint_positions';
     
     opts.backgroundnum=200000 ; % 55000;
-    %opts.imdbPath = sprintf('/sequoia/data1/gcheron/code/cnn_matconvnet/training/experiments/JHMDB_fine-tuning/imdb_JHMDB_split%d_%s_bnum%i.mat',opts.split,opts.part,opts.backgroundnum);
-    opts.imdbPath = sprintf('/sequoia/data1/gcheron/code/cnn_matconvnet/training/experiments/JHMDB_fine-tuning/imdb_JHMDB_APP_split%d_%s_bnum%i.mat',opts.split,opts.part,opts.backgroundnum);
+    opts.imdbPath = sprintf('/sequoia/data1/gcheron/code/cnn_matconvnet/training/experiments/JHMDB_fine-tuning/imdb_JHMDB_split%d_%s_bnum%i.mat',opts.split,opts.part,opts.backgroundnum);
+    %opts.imdbPath = sprintf('/sequoia/data1/gcheron/code/cnn_matconvnet/training/experiments/JHMDB_fine-tuning/imdb_JHMDB_APP_split%d_%s_bnum%i.mat',opts.split,opts.part,opts.backgroundnum);
     opts.lite = false ;
     
-    opts.netpath = 'imagenet-vgg-f.mat';%'bignet_flow_wmag_finetune_split1_iter_50000.mat';
+    opts.netpath = 'bignet_flow_wmag_finetune_split1_iter_50000.mat';%'imagenet-vgg-f.mat';%'bignet_flow_wmag_finetune_split1_iter_50000.mat';
     opts.train.prefetch = true ;
     opts.train.batchSize = 128 ;
     opts.train.numEpochs = 60 ;
     opts.train.continue = true ;
     opts.train.gpus = gpuID ;
-    opts.train.learningRate = [1e-3*ones(1,20) 1e-4*ones(1,20) 1e-5*ones(1,20)] ;
+    opts.train.learningRate = [1e-3*ones(1,20) 1e-4*ones(1,20)];% 1e-5*ones(1,20)] ;
     opts.train.expDir = opts.expDir ;
     opts.train.backPropDepth = +inf ; % 11 % until conv5 % +inf; % BP all ; %8 all FC ;
     
@@ -185,5 +186,9 @@ net.layers{end-2}=struct('type', 'dropout','rate', 0.5) ; % drop out 21
 net.layers{end-3}=net.layers{end-4} ; % relu 20
 net.layers{end-4}=net.layers{end-5} ; % 2nd fully 19
 net.layers{end-5}=struct('type', 'dropout','rate', 0.5) ; % drop out 18
+
+if strcmp(net.layers{end}.type,'softmax')
+    net.layers{end}.type='softmaxloss';
+end
 
 

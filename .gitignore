@@ -3,6 +3,7 @@
 import_caffe_networks/OF_caffe_net/
 matconvnet-1.0-beta11.tar
 training/bignet_flow_wmag_finetune_split1_iter_50000.mat
+training/imagenet-vgg-f.mat
 training/experiments
 training/image_pre-normalization
 
